@@ -1,0 +1,577 @@
+---
+title: "MONID Academy Survey Report"
+author: "Beryl Musundi"
+format: html
+execute:
+  echo: false
+---
+
+## Overview
+
+This report presents the findings from the MONID Academy survey conducted in Q1 of 2025. The survey aimed to perform a needs assessment for junior researchers (PhD and Postdocs) and PIs/Consortia leads (senior researchers) to guide the establishment of a virtual curriculum in infectious disease modelling.
+
+```{r}
+#| label: load packages
+#| warning: false
+#| messages: false
+library("tidyverse")
+#library("dplyr")
+library("ggplot2")
+library("ggsci")
+library("viridis")
+library("ggpubr")
+```
+
+### Analysis of Junior Researcher Responses
+
+```{r}
+#| echo: false
+#| warning: false
+#load data file
+datapath <-"C:/Users/MusunBe/Documents/MONID academy/Monidacademy/"
+
+junior_data <- read.csv(paste0(datapath, "results-survey368812.csv"))
+
+#Tidy the data set
+
+junior_data_modified <-junior_data %>% rename(Position_1 = What.is.your.current.position.,
+                                              Position_other = What.is.your.current.position...Other.,
+                                              Research = What.is.your.current.research.focus.,
+                                              Background_1 = What.is.your.research.background...Mathematics.and.Computer.Sciences.,
+                                              Background_2= What.is.your.research.background...Biological.Sciences..Biology..Bioinformatics..Biochemistry.and.molecular.biology..Ecology..Virology.....,
+                                              Background_3 = What.is.your.research.background...Physical.Sciences..Physics..Acoustics..Chemical.physics..Planetary.science.....,
+                                           Background_4 = What.is.your.research.background...Chemical.Sciences..Chemistry..Organic.chemistry.....,
+                                           Background_5 = What.is.your.research.background...Engineering.and.Technology..Robotics..Mechanical.engineering..Chemical.engineering..Bioengineering..Nano.technology.....,
+                                           Background_6 = What.is.your.research.background...Medicine.and.Health.Sciences..Clinical.Medicine..Global.Health..Epidemiology.....,
+                                           Background_7 = What.is.your.research.background...Social.Sciences..Psychology..Economics..Education..Sociology..Law..Political..Media.....,
+                                        Background_8 =   What.is.your.research.background...Agricultural.Sciences.,
+                                       Background_9 = What.is.your.research.background...Humanities..History..Literature..Philosophy..Ethics..Arts..,
+                                          Background_Other = What.is.your.research.background...Other.,
+                                         Learning_style_1 = What.is.your.preferred.learning.style....Live.online.lectures.,
+                                       Learning_style_2 = What.is.your.preferred.learning.style....Recorded.tutorials.,
+                                        Learning_style_3 =What.is.your.preferred.learning.style....Interactive.coding.workshops.,
+                                       Learning_style_4 = What.is.your.preferred.learning.style....Collaborative.projects.,
+                                      Learning_style_5 =  What.is.your.preferred.learning.style....Other.,
+Topic_1 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Epidemiological.foundations..e.g...Basic.reproduction.number..incidence..attack.rate..herd.immunity...,
+Topic_2 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Mathematical.modelling.approaches..equation.based..deterministic..e.g...SIR..SEIR...stochastic..extensions..e.g...age.structure....,
+Topic_3 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Agent.Based.Modelling..,
+Topic_4 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Data.analysis.and.statistical.methods..e.g...time.series.analysis..hypothesis.testing...,
+Topic_5 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Model.calibration.and.parameter.estimation..,
+Topic_6 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Spatial.and.network.modelling..contact.patterns..meta.population.models...,
+Topic_7 =    Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Programming..e.g...R..Python..and.computational.techniques..,
+Topic_8 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Economic.impact.of.infectious.diseases..e.g...cost.effectiveness.of.interventions..optimization..,
+Topic_9 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Modelling.interventions..,
+Topic_10 = Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Human.behavior.in.disease.dynamics..,
+Topic_11 =    Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Scenario.modelling.and.forecasting.,
+Topic_other =  Which.of.the.following.infectious.disease.topics.would.you.like.the.training.to.focus.on....Other.,
+ Consortium_1 = Which.consortium.in.MONID.are.you.affiliated.with....infoXpand.,
+ Consortium_2 = Which.consortium.in.MONID.are.you.affiliated.with....INSIDe..,
+Consortium_3 = Which.consortium.in.MONID.are.you.affiliated.with....LOKI..,
+Consortium_4 = Which.consortium.in.MONID.are.you.affiliated.with....MODUS.Covid..,
+Consortium_5 = Which.consortium.in.MONID.are.you.affiliated.with....OptimAgent..,
+Consortium_6 = Which.consortium.in.MONID.are.you.affiliated.with....PANDEMOS..,
+Consortium_7 = Which.consortium.in.MONID.are.you.affiliated.with....PREPARED..,
+Consortium_8 = Which.consortium.in.MONID.are.you.affiliated.with....PROGNOSIS..,
+Consortium_9 = Which.consortium.in.MONID.are.you.affiliated.with....RESPINOW..,
+Consortium_10 = Which.consortium.in.MONID.are.you.affiliated.with....SEMSAI.,
+Consortium_None = Which.consortium.in.MONID.are.you.affiliated.with....None.,
+Knowledge_1 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Epidemiological.foundations..e.g...Basic.reproduction.number..incidence..attack.rate..herd.immunity..,
+Knowledge_2 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Mathematical.modelling.approaches..equation.based..deterministic..e.g...SIR..SEIR...stochastic..extensions..e.g...age.structure....,
+Knowledge_3 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Agent.Based.Modelling..,
+Knowledge_4 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Data.analysis.and.statistical.methods..e.g...time.series.analysis..hypothesis.testing...,
+knowledge_5 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Model.calibration.and.parameter.estimation..,
+Knowledge_6 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Spatial.and.network.modelling..contact.patterns..meta.population.models...,
+Knowledge_7 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Programming..e.g...R..Python..and.computational.techniques.,
+Knowledge_8 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Economic.impact.of.infectious.diseases..e.g...cost.effectiveness.of.interventions..optimization..,
+Knowledge_9 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Modelling.interventions.,
+Knowledge_10 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Human.behavior.in.disease.dynamics..,
+Knowledge_11 = How.would.you.rate.your.current.knowledge.in.the.following.infectious.disease.topics...Please.rank.in.the.order.of.knowledge.with.1...not.very.good..5....very.good....Scenario.modelling.and.forecasting.,
+ Time_1 = How.much.time.would.you.be.willing.to.dedicate.to.curriculum.activities..e.g...lectures..projects..per.week.,
+Time_other = How.much.time.would.you.be.willing.to.dedicate.to.curriculum.activities..e.g...lectures..projects..per.week...Other.,
+Comments = Do.you.have.any.other.comments.for.us..)%>%
+  select(-Start.language, -Seed)%>%mutate(across(where(is.character), ~na_if(., "")))
+ 
+#colnames(junior_data_modified) 
+  
+```
+
+```{r}
+#analysis
+#| echo: false
+
+incomplete_responses_junior <- junior_data_modified%>% filter(is.na(Date.submitted))
+unanswered_junior <- junior_data_modified%>% filter(is.na(Last.page))
+final_junior <- junior_data_modified%>% filter(!is.na(Date.submitted)) 
+
+```
+
+A total of `r nrow(junior_data)` responses from Junior researchers were received. Of these `r nrow(incomplete_responses_junior)` responses were excluded from the final analysis due to incompleteness, defined as less than 70 % of the questions answered. This led to a final sample size of `r nrow(final_junior)` junior participants for this report. Missing data were handled using listwise deletion for individual question analyses.
+
+##### Research Position
+
+```{r}
+#| echo: false
+research_position <- final_junior %>% group_by(Position_1)%>%
+  summarize(num = n())%>%
+  mutate(Position_1 =factor(Position_1, levels = c("PhD", "Postdoc", "Other")),
+         prop = num/sum(num)*100)
+```
+
+`r research_position$prop[2]` % (n = `r research_position$num[2]`) of the respondents were PhD candidates, `r research_position$prop[3]` % (n = `r research_position$num[3]`) were Postdocs and `r research_position$prop[1]` % (n = `r research_position$num[1]`) were others including scientific assistant (@fig-position).
+
+```{r}
+#| echo: false
+#| label: fig-position
+#| fig-cap: "Proportion of junior researchers"
+#| fig-height: 3 
+ggplot(research_position, aes(Position_1, prop, fill = Position_1))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Research Position",
+    y = "Proportion", 
+    fill = "Position"
+  ) 
+```
+
+##### Consortium
+
+```{r}
+#| echo: false
+consortium = final_junior %>% select(Response.ID, starts_with("Consortium_"))%>%
+  pivot_longer(col = starts_with("Consortium_"),
+               names_to = "Consortium_id",
+               values_to = "response")%>%
+  filter(response == "Yes")%>%
+  group_by(Consortium_id)%>%
+  summarize(num = n())%>%
+  mutate(prop = round( num/sum(num)*100, 1))%>%
+  mutate(Consortium_id = factor(Consortium_id, levels = c("Consortium_1", "Consortium_2", "Consortium_3", "Consortium_4", "Consortium_5", "Consortium_6", "Consortium_9", "Consortium_10", "Consortium_None"), labels = c("infoXpand", "INSIDe", "LOKI", "MODUS-Covid", "OptimAgent", "PANDEMOS", "RESPINOW", "SEMSAI", "None")) )
+  
+```
+
+`r nrow(consortium)-1` MONID research Consortia were represented in the survey. Additionally, there were `r consortium$prop[9]` % of respondents not affiliated/not in MONID represented (@fig-consortium).
+
+```{r}
+#| echo: false
+#| label: fig-consortium
+#| fig-cap: "Proportion of consortium members"
+#| fig-height: 3
+ggplot(consortium, aes(Consortium_id, prop, fill = Consortium_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Consortium",
+    y = "Proportion", 
+    fill = "Consortium"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Research Background
+
+```{r}
+#| echo: false
+research_background = final_junior %>% select(Response.ID, starts_with("Background_"))%>%
+  pivot_longer(col = starts_with("Background_"),
+               names_to = "Background_id",
+               values_to = "response")%>%
+  filter(response == "Yes")%>%
+  group_by(Background_id)%>%
+  summarize(num = n())%>%
+  mutate(prop = round( num/sum(num)*100, 1))%>%
+  mutate(Background_id = factor(Background_id, levels = c("Background_1", "Background_2", "Background_3", "Background_4", "Background_5", "Background_6","Background_7","Background_8", "Background_9", "Background_Other"), labels = c("Mathematics and Computer Sciences", "Biological Sciences", "Physical Sciences", "Chemical Sciences", "Engineering and Technology", "Medicine and Health Sciences", "Social Sciences", "Agricultural Sciences", "Humanities", "Other")) )
+  
+```
+
+Majority of the respondents had a background in Mathematics and Computer sciences (`r research_background$prop[1]` %) and Medical and Health sciences (`r research_background$prop[5]` %) (@fig-background).
+
+```{r}
+#| echo: false
+#| label: fig-background
+#| fig-cap: "Proportion from the different research backgrounds"
+#| fig-height: 3
+
+ggplot(research_background, aes(Background_id, prop, fill = Background_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Research background",
+    y = "Proportion", 
+    fill = "Research background"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Current Knowledge in Infectious Disease Topics
+
+```{r}
+#| echo: false
+#| warning: false
+current_knowledge = final_junior %>% select(Response.ID, starts_with("Knowledge_"))%>%
+  pivot_longer(col = starts_with("Knowledge_"),
+               names_to = "Knowledge_id",
+               values_to = "response")%>%
+  group_by(Knowledge_id, response)%>%
+  summarize(num = n())%>%
+  mutate(prop = round(num/sum(num)*100,1))%>%
+  mutate(Knowledge_id = factor(Knowledge_id, levels = c("Knowledge_1", "Knowledge_2", "Knowledge_3", "Knowledge_4", "knowledge_5", "Knowledge_6","Knowledge_7","Knowledge_8", "Knowledge_9", "Knowledge_10", "Knowledge_11"), labels = c("Epidemiological foundations", "Mathematical modelling approaches (Equation-based)", "Agent based modelling", "Data analysis and statistical methods ", "Model calibration and parameter estimation", "Spatial and network modelling", "Programming and computational techniques", "Economic impact of infectious diseases", "Modelling interventions", "Human behaviour in disease dynamics", "Scenario modelling and forecasting")),
+         response = factor(response, levels = c("1", "2", "3", "4", "5")))
+```
+
+There was limited knowledge in most of the infectious disease topics (rating: 1-not very good to 5- very good). However, most of the participants had at least some knowledge in epidemiological foundations and equation-based mathematical modelling approaches (@fig-current_knowledege).
+
+```{r}
+#| echo: false
+#| label: fig-current_knowledege
+#| fig-cap: "Current knowledge in infectious disease topics"
+#| fig-width: 14
+#| fig-height: 12
+
+ggplot(current_knowledge, aes(response, prop, fill = response))+
+  geom_bar(stat = "identity", width = 0.7 )+
+  facet_wrap(~ Knowledge_id, ncol = 3, )+
+  scale_fill_lancet()+
+  labs(
+    x = "Rating",
+    y = "Proportion", 
+    fill = "Rating"
+  ) +
+   theme(axis.text.x =element_blank())
+  
+```
+
+##### Infectious disease Topics that should be included in the virtual curriculumn
+
+```{r}
+#| echo: false
+#| warning: false
+interesting_topics <- final_junior %>% select(Response.ID, starts_with("Topic_"))%>%
+  pivot_longer(col = starts_with("Topic_"),
+               names_to = "topic_id",
+               values_to = "response")%>%
+               filter(!response == "No" ) %>%
+   group_by(topic_id)%>%
+  summarize(num = n())%>%
+  mutate(prop = round(num/sum(num)*100,1))%>%
+  mutate(topic_id = factor(topic_id, levels = c("Topic_1", "Topic_2", "Topic_3", "Topic_4", "Topic_5", "Topic_6","Topic_7","Topic_8", "Topic_9", "Topic_10", "Topic_11", "Topic_other"), labels = c("Epidemiological foundations", "Mathematical modelling approaches(Equation-based)", "Agent based modelling", "Data analysis and statistical methods ", "Model calibration and parameter estimation", "Spatial and network modelling", "Programming and computational techniques", "Economic impact of infectious diseases", "Modelling interventions", "Human behaviour in disease dynamics", "Scenario modelling and forecasting", "other")))
+```
+
+There was overall general interest in most of the infectious disease topics. The two most preferred topics were: Model calibration and parameter estimation and Spatial and network modelling (contact patterns, meta-population models) (@fig-interesting_topics).
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-interesting_topics
+#| fig-cap: "Infectious disease topics that should be part of the training"
+#| fig-height: 4
+
+ggplot(interesting_topics, aes(topic_id, prop, fill = topic_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_viridis_d()+
+  labs(
+    x = "Infectious disease topics",
+    y = "Proportion", 
+    fill = "Topic"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Learning style
+
+```{r}
+#| echo: false
+learning_style <- final_junior %>% select(Response.ID, starts_with("Learning_"))%>%
+  pivot_longer(col = starts_with("Learning_"),
+               names_to = "learning_id",
+               values_to = "response")%>%
+               filter(!response == "No" ) %>%
+   group_by(learning_id)%>%
+  summarize(num = n())%>%
+   mutate(prop = round(num/sum(num)*100,1))%>%
+    mutate(learning_id = factor(learning_id, levels = c("Learning_style_1", "Learning_style_2", "Learning_style_3", "Learning_style_4", "Learning_style_5"), labels = c("Live/online lectures", "Recorded tutorials", "Interactive coding workshops", "Collaborative projects", "Other")) )
+
+```
+
+The most preferred learning styles were interactive coding workshops and live/online lecture (@fig-learning_styles).
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-learning_styles
+#| fig-cap: "Learning styles"
+#| fig-height: 3 
+
+ggplot(learning_style, aes(learning_id, prop, fill = learning_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Learning Style",
+    y = "Proportion", 
+    fill = " Preferred learning style"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Time
+
+```{r}
+#| echo: false
+ timing <- final_junior %>% select(Response.ID, starts_with("Time_")) %>%
+  filter(!is.na(Time_1))%>%
+ group_by(Time_1)%>%
+   summarize(num = n())%>%
+    mutate(prop = round(num/sum(num)*100,1))
+```
+
+Most participants would prefer to dedicate 2-3 hours per week on curriculum activities (@fig-time).
+
+```{r}
+#| echo: false
+#| label: fig-time
+#| fig-cap: "Time per week dedicated to curriculum activities"
+#| fig-height: 3 
+
+ggplot(timing, aes(Time_1, prop, fill = Time_1))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Time",
+    y = "Proportion", 
+    fill = "Time"
+  ) 
+```
+
+##### Comments
+
+It was suggested to include a network to define and rank the main research questions and needs of specific fields. Additionally, competitions with open datasets could be included as part of the learning to solve some specific questions.
+
+### Analysis of PIs/Consortia Leads Responses
+
+```{r}
+#| echo: false
+#| warning: false
+#load data file
+datapath <-"C:/Users/MusunBe/Documents/MONID academy/Monidacademy/"
+
+senior_data <- read.csv(paste0(datapath, "results-survey191161.csv"))
+
+senior_data_modified <- senior_data%>%
+  rename(Consortium_1 = Which.consortium.in.MONID.are.you.affiliated.with....infoXpand..,
+ Consortium_2 = Which.consortium.in.MONID.are.you.affiliated.with....INSIDe..,
+Consortium_3 = Which.consortium.in.MONID.are.you.affiliated.with....LOKI..,
+Consortium_4 = Which.consortium.in.MONID.are.you.affiliated.with....MODUS.Covid..,
+Consortium_5 = Which.consortium.in.MONID.are.you.affiliated.with....OptimAgent..,
+Consortium_6 = Which.consortium.in.MONID.are.you.affiliated.with....PANDEMOS..,
+Consortium_7 = Which.consortium.in.MONID.are.you.affiliated.with....PREPARED..,
+Consortium_8 = Which.consortium.in.MONID.are.you.affiliated.with....PROGNOSIS..,
+Consortium_9 = Which.consortium.in.MONID.are.you.affiliated.with....RESPINOW..,
+Consortium_10 = Which.consortium.in.MONID.are.you.affiliated.with....SEMSAI.,
+Consortium_None = Which.consortium.in.MONID.are.you.affiliated.with....None.,
+Skills_gap = What.specific.skill.gaps.in.infectious.disease.modelling.have.you.observed.among.incoming.PhD.students.young.postdocs.in.your.group..,
+Topic_1 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Epidemiological.foundations..e.g...Basic.reproduction.number..incidence..attack.rate..herd.immunity..,
+Topic_2 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Mathematical.modelling.approaches..equation.based..deterministic..e.g...SIR..SEIR...stochastic..extensions..e.g...age.structure...,
+Topic_3 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Agent.Based.Modelling.,
+Topic_4 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Data.analysis.and.statistical.methods..e.g...time.series.analysis..hypothesis.testing..,
+Topic_5 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Model.calibration.and.parameter.estimation.,
+Topic_6 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Spatial.and.network.modelling..contact.patterns..meta.population.models..,
+Topic_7 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Programming..e.g...R..Python..and.computational.techniques.,
+Topic_8 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Economic.impact.of.infectious.diseases..e.g...cost.effectiveness.of.interventions..optimization..,
+Topic_9 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Modelling.interventions.,
+Topic_10 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Human.behavior.in.disease.dynamics.,
+Topic_11 = Which.of.the.following.infectious.disease.modelling.topics.should.be.prioritized.for.training.in.the.virtual.curriculum...Please.rank.the.following.options.in.the.order.of.their.importance.with1.least.important..5.most.important....Scenario.modelling.and.forecasting.,
+Curriculum_type = What.balance.should.the.curriculumn.strike.between.theoretical.knowledge.and.practical.application.,
+Learning_style_1 = What.course.format.would.you.recommend...Live.online.lectures.,
+Learning_style_2 = What.course.format.would.you.recommend...Recorded.tutorials.,
+Learning_style_3 = What.course.format.would.you.recommend...Interactive.coding.workshops.,
+Learning_style_4 = What.course.format.would.you.recommend...Collaborative.projects.,
+Learning_style_5 = What.course.format.would.you.recommend...Other.,
+other_content = What.other.content..technical.or.non.technical..should.be.included.in.the.curriculum.,
+Challenges = What.challenges.do.you.foresee.in.the.implementation.of.the.virtual.curriculum..,
+Modules = Are.there.specific.modules..frameworks.or.platforms.from.your.team.that.could.be.included.in.the.training..,
+Modules_list = Please.list.the.modules..frameworks.or.platforms.,
+)%>%
+  select(-Start.language, -Seed)%>%mutate(across(where(is.character), ~na_if(., "")))
+```
+
+```{r}
+#analysis
+#| echo: false
+
+incomplete_responses_senior <- senior_data_modified%>% filter(is.na(Date.submitted))
+unanswered_senior <- senior_data_modified%>% filter(is.na(Last.page))
+final_senior <- senior_data_modified%>% filter(!is.na(Date.submitted)) 
+```
+
+A total of `r nrow(senior_data)` responses from PIs were received. Of these `r nrow(incomplete_responses_senior)` responses were excluded from the final analysis due to incompleteness, defined as less than 70 % of the questions answered. This led to a final sample size of `r nrow(final_senior)` participants using to report this section findings.
+
+##### Consortium
+
+```{r}
+#| echo: false
+consortium_senior <- final_senior %>% select(Response.ID, starts_with("Consortium_"))%>%
+  pivot_longer(col = starts_with("Consortium_"),
+               names_to = "Consortium_id",
+               values_to = "response")%>%
+  filter(response == "Yes")%>%
+  group_by(Consortium_id)%>%
+  summarize(num = n())%>%
+  mutate(prop = round( num/sum(num)*100, 1))%>%
+  mutate(Consortium_id = factor(Consortium_id, levels = c("Consortium_1", "Consortium_2", "Consortium_3", "Consortium_4", "Consortium_5", "Consortium_6", "Consortium_9", "Consortium_10", "Consortium_None"), labels = c("infoXpand", "INSIDe", "LOKI", "MODUS-Covid", "OptimAgent", "PANDEMOS", "RESPINOW", "SEMSAI", "None")) )
+  
+```
+
+`r nrow(consortium_senior)` MONID research Consortia were represented in the survey (@fig-consortium_senior).
+
+```{r}
+#| echo: false
+#| label: fig-consortium_senior
+#| fig-cap: "Consortium for senior researchers"
+#| fig-height: 3
+
+ggplot(consortium_senior, aes(Consortium_id, prop, fill = Consortium_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Consortium",
+    y = "Proportion", 
+    fill = "Consortium"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Skills Gap
+
+The senior researchers had observed the following skills gap in the junior researchers in their groups:
+
+-   Inadequate knowledge in basic statistics for epidemiology for junior researchers with computational background such as physics, mathematics and informatics.
+-   Gap in mathematical background knowledge for solving or simulating disease systems.
+-   Inadequate programming skills, writing skills and causal modelling skills.
+-   Lack of skills in statistical modelling, parameter estimation, Bayesian statistics and uncertainty analysis.
+
+##### Infectious disease topics to be considered in the curriculum
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+interesting_topics_senior <- final_senior %>% select(Response.ID, starts_with("Topic_"))%>%
+  pivot_longer(col = starts_with("Topic_"),
+               names_to = "topic_id",
+               values_to = "response")%>%
+              group_by(topic_id, response)%>%
+   summarize(num = n())%>%
+   mutate(prop = round(num/sum(num)*100,1))%>%
+   mutate(topic_id = factor(topic_id, levels = c("Topic_1", "Topic_2", "Topic_3", "Topic_4", "Topic_5", "Topic_6","Topic_7","Topic_8", "Topic_9", "Topic_10", "Topic_11"), labels = c("Epidemiological foundations", "Mathematical modelling approaches(Equation-based)", "Agent based modelling", "Data analysis and statistical methods ", "Model calibration and parameter estimation", "Spatial and network modelling", "Programming and computational techniques", "Economic impact of infectious diseases", "Modelling interventions", "Human behaviour in disease dynamics", "Scenario modelling and forecasting")),
+          response = factor(response, levels = c("1", "2", "3", "4", "5")))
+```
+
+There was general interest in inclusion of most of the infectious disease topics in the curriculum (@fig-current_topic_senior).
+
+```{r}
+#| echo: false
+#| label: fig-current_topic_senior
+#| fig-cap: "Topics to be considered in the virtual curriculum"
+#| fig-width: 14
+#| fig-height: 12
+
+ggplot(interesting_topics_senior, aes(response, prop, fill = response))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  facet_wrap(~ topic_id, ncol = 3, )+
+  scale_fill_lancet()+
+  labs(
+    x = "",
+    y = "Proportion", 
+    fill = "Rating"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Other content to be considered
+
+-   Teaching interdisciplinary collaboration.
+-   Bayesian model inference.
+-   Optional courses on Python or Julia programming.
+
+##### Course format
+
+```{r}
+#| echo: false
+course_format <- final_senior %>% select(Response.ID, starts_with("Learning_"))%>%
+  pivot_longer(col = starts_with("Learning_"),
+               names_to = "learning_id",
+               values_to = "response")%>%
+               filter(!response == "No" ) %>%
+   group_by(learning_id)%>%
+  summarize(num = n())%>%
+   mutate(prop = round(num/sum(num)*100,1))%>%
+    mutate(learning_id = factor(learning_id, levels = c("Learning_style_1", "Learning_style_2", "Learning_style_3", "Learning_style_4", "Learning_style_5"), labels = c("Live/online lectures", "Recorded tutorials", "Interactive coding workshops", "Collaborative projects", "Other")) )
+
+```
+
+The most preferred course format was live/online lectures (@fig-learning_styles_senior).
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-learning_styles_senior
+#| fig-cap: "Preferred course format"
+#| fig-height: 3 
+
+
+ggplot(course_format, aes(learning_id, prop, fill = learning_id))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = "Course format",
+    y = "Proportion",
+    fill = " Preferred course format"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Curriculum type
+
+```{r}
+curriculum_type <- final_senior %>% select(Response.ID, Curriculum_type)%>%
+   group_by(Curriculum_type)%>%
+  summarize(num = n())%>%
+   mutate(prop = round(num/sum(num)*100,1))
+```
+
+A mix of both theoretical and practical content would be suited for the curriculum (@fig-curriculum_type).
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-curriculum_type
+#| fig-cap: "Preferred curriculum type"
+#| fig-height: 3 
+
+ggplot(curriculum_type, aes(Curriculum_type, prop, fill = Curriculum_type))+
+  geom_bar(stat ="identity", width = 0.7 )+
+  scale_fill_lancet()+
+  labs(
+    x = " ",
+    y = "Proportion",
+    fill = "Curriculum format"
+  ) +
+   theme(axis.text.x =element_blank())
+```
+
+##### Available modules
+
+The following modules and computational tools from the groups are available and could be offered in the curriculum.
+
+-   OptimAgent: Modeling intervention; networks; parameter calibrations.
+-   INSIDe: Modules on parameter estimation and uncertainty analysis.
+-   INSIDe: Computational tools such as pyPESTO and pyABC for training different types of models.
+-   infoXpand: Block courses that could be opened to (some) guests from MONID.
+
+##### Potential challenges
+
+The following were listed as challenges that could influence curriculum implementation.
+
+-   Coherence across the diverse research groups, labs and interdisciplinary background of participants.
+-   Connection across locations.
+-   Limited chance for effective learning implementation without series of hands on workshops.
