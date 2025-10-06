@@ -28,9 +28,9 @@ library("ggpubr")
 #| echo: false
 #| warning: false
 #load data file
-datapath <-"C:/Users/MusunBe/Documents/MONID academy/Monidacademy/"
+datapath <-"enter file path "
 
-junior_data <- read.csv(paste0(datapath, "results-survey368812.csv"))
+junior_data <- read.csv(paste0(datapath, "file_name.csv"))
 
 #Tidy the data set
 
@@ -352,9 +352,9 @@ It was suggested to include a network to define and rank the main research quest
 #| echo: false
 #| warning: false
 #load data file
-datapath <-"C:/Users/MusunBe/Documents/MONID academy/Monidacademy/"
+datapath <-"enter_file_path"
 
-senior_data <- read.csv(paste0(datapath, "results-survey191161.csv"))
+senior_data <- read.csv(paste0(datapath, "file_name.csv"))
 
 senior_data_modified <- senior_data%>%
   rename(Consortium_1 = Which.consortium.in.MONID.are.you.affiliated.with....infoXpand..,
@@ -575,3 +575,4 @@ The following were listed as challenges that could influence curriculum implemen
 -   Coherence across the diverse research groups, labs and interdisciplinary background of participants.
 -   Connection across locations.
 -   Limited chance for effective learning implementation without series of hands on workshops.
+
